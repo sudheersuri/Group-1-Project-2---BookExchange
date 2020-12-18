@@ -13,7 +13,6 @@ const DOMAIN = "sandbox97e61f2954d34e089bd93a3510e9c5fa.mailgun.org";
 const api_key = "63e5b8e05f853a86285305d137fb29aa-360a0b2c-9b053ba1";
 const mg = mailgun({ apiKey: api_key, domain: DOMAIN });
 const authorized_recipients = [
-  "sudhirsuri43@gmail.com",
   "ssuri@confederationcollege.ca",
   "mkoyande@confederationcollege.ca",
   "eduardo.coelhoreis@confederationcollege.ca",
@@ -532,7 +531,10 @@ app.post("/adduser", (req, res) => {
   if (!authorized_recipients.includes(email)) {
     req.session.addusrmsg =
       "Sorry, Only selected confederation college email ids are allowed to signup!";
-    res.redirect("/signup");
+    res.send({
+      error:
+        "Sorry, Only selected confederation college email ids are allowed to signup!",
+    });
     return;
   }
   const queryString = `insert into users(email,username,password) values('${email}','${uname}','${psw}')`;
@@ -540,12 +542,16 @@ app.post("/adduser", (req, res) => {
   connection.query(queryString, (err, result, fields) => {
     if (err != null) {
       req.session.addusrmsg = "User Already exists!";
-      res.redirect("/signup");
+      res.send({
+        error: "User Already exists!",
+      });
 
       // Send Code Error to the user.
     } else {
       req.session.username = uname;
-      res.redirect("/home");
+      res.send({
+        message: "User Has been added!",
+      });
     }
   });
 });
@@ -569,18 +575,18 @@ app.post("/sendforgetemail", (req, res) => {
   connection.query(queryString, (err, result, fields) => {
     if (err != null) {
       req.session.forgetmailmsg = "Something went wrong please try again!";
-
+      res.send({ error: "Something went wrong please try again!" });
       flag = 0;
     }
     if (result.length == 0) {
       req.session.forgetmailmsg = "No user exists!";
-      res.redirect("/forget");
+      res.send({ error: "No user exists!" });
       flag = 0;
     } else {
       username = result[0].username;
       psw = result[0].password;
 
-      const output = `<p>Hi ${username} , your password is <strong> ${psw}</strong></p><a href='http://localhost:4000/login'><strong>Please Login</strong></a>`;
+      const output = `<p>Hi ${username} , your password is <strong> ${psw}</strong></p><a href='http://localhost:3000/login'><strong>Please Login</strong></a>`;
       var data = {
         from: "bookexchangesupport <bookexchangesupport@confed.com>",
         to: email,
@@ -591,8 +597,8 @@ app.post("/sendforgetemail", (req, res) => {
         console.log(body);
         console.log("sent");
       });
-      req.session.forgetmailmsg = "Recovery Mail has been sent!";
-      res.redirect("/forget");
+
+      res.send({ message: "Recovery Mail has been sent!" });
     }
   });
 });
