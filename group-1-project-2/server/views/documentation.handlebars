@@ -1,0 +1,104 @@
+{{> header}}
+<link rel="stylesheet" href="/public/css/documentation.css">
+<div class="container">
+    <div id="intro">
+        <h2>Documentaion v1.0</h2>
+        <p>Following table consists list of publicly available enpoints.</p>
+    </div>
+
+    <br>
+    <br>
+    <div>
+        <table class="table table-striped">
+            <tr>
+                <th>API End Point</th>
+                <th>Response Parameters</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>/login </td>
+                <td>app.get'/login' gets the login detials and gives error message if error occurs while login else if
+                    no error it <br> provides
+                    login to the user.</td>
+                <td> This API verifies the login credentials and provides login page if credentials are right ,
+                    otherwise gives an error message.</td>
+            </tr>
+            <tr>
+                <td>/search </td>
+                <td>app.post'/search' this requests to search the request book by the user.</td>
+                <td> This API Signs up the user.</td>
+            </tr>
+            <tr>
+                <td>/home</td>
+                <td>app.get'/home' <br>
+                    > Gets the connection and gives the error messages
+
+                    > If everything is fine gives message Welcome to BookExchange.
+                    > If there are more than one attempts of previous login then it returns a list on login history
+                    roows
+                    of the respective user id.<br>
+                    > On selection of genres it returns the selected genre else it returns the selected genre.<br>
+                    > If everything is correct it returns the selected genere with the books in it with their
+                    Name,Decription,Image, Book posted date.<br>
+
+                </td>
+                <td> This API endpoint allows user to view books, search books, filter books by genres</td>
+            </tr>
+            <tr>
+                <td>/loginhistory</td>
+                <td> > returns the lastlogindate from the login history based on the user's id else gives an error
+                    message if anything goes wrong gives the error message<br>
+                    > If everything is fine gives message Welcome to BookExchange.</td>
+                <td>This API searches the login date from the login history based on the user id. If there is any error
+                    <br>
+                    it will display the error message of something went wrong otherwise it gives the last login and the
+                    user id and associated last login date.
+                </td>
+            </tr>
+            <tr>
+                <td>/forget</td>
+                <td>
+                    app.get'/forget' selects the username and password from db where the
+                    email id is as entered by user<br> > If something goes wrong returns the error message else it if
+                    user enters no email id then gives message User does not exists<br>
+                    > If user enters a vaild recovery email then to the selected respective user id with the email id
+                    and password <br>
+                    associated with it an email is sent on the recovery email id of the user with the password as stored
+                    in the BookExchange system for it.<br>
+                    After this a message is given the Recovery mail has been sent!
+
+                </td>
+                <td> This API endpoint allows user to recover their forgotten password by entering their mail id.</td>
+            </tr>
+            <tr>
+                <td>/genres</td>
+                <td>
+                    returns genrename , public ratings, user rating and genrelist.
+                </td>
+                <td> This API endpint shows user genres, public rating , user rating, this endpoint also allows users to
+                    rate a genre.</td>
+            </tr>
+            <tr>
+                <td>/uploadbook</td>
+                <td>
+                    > Retruns the list of genres and gives the selected genre by the user. <br>
+                    > Then if there is something wrong while uploading a book by the user it gives an error message.<br>
+                    > It also enables the user to only upload the images of the book if user uploads any other file it
+                    gives error message.<br>
+                    > If Everything is fine it uploads a book to the selected genre and gives a message Book Added!
+
+                </td>
+                <td>This API endpoint allows users to upload book into bookexchange database.</td>
+            </tr>
+            <tr>
+                <td>/logout</td>
+                <td>
+                    > Return the destroys session request.
+                </td>
+                <td>This API logs out the user from the Web Application account and redirects to the login page of the
+                    Web Application. </td>
+            </tr>
+        </table>
+    </div>
+</div>
+{{> footer}}

@@ -1,0 +1,44 @@
+{{> header}}
+<script src="/public/js/uploadbook.js"></script>
+
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Upload Your Book</h2>
+    </div>
+    <div class="card-body">
+      <form action="/uploadbook" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="bookname">Book Name</label><br>
+          <input type="text" name="bookname" id="bookname" size="35"
+            placeholder="Eg: Harry Potter - Prisonser of askaban" />
+        </div>
+        <div class="form-group">
+          <label for="bookdesc">Book Description</label><br>
+          <input type="text" name="bookdesc" id="bookdesc" size="50"
+            placeholder="Eg: Amazing book , book in good condition" />
+        </div>
+        <div class="form-group">
+          <label for="genreid">Genre</label><br>
+          <select name="genreid">
+            {{#each genrelist}}
+            <option value="{{this.genreid}}">{{this.genredesc}}</option>
+            {{/each}}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="">Browse Image</label>
+          <input type="file" id="myfile" accept="image/*" name="myfile" />
+        </div>
+        <center>
+          <p>{{errmsg}}</p>
+        </center>
+        <center>
+          <p><i>{{msg}}</i></p>
+        </center>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+{{> footer}}

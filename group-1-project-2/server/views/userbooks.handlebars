@@ -1,0 +1,49 @@
+{{> header}}
+<link href="userbooks.css" rel="stylesheet"/>
+
+<body>
+
+    <div class="container">
+        <h2>Hi {{username}}, Please select a book to exchange!</h2>
+        <!-- Trigger the modal with a button -->
+        <table id="tableone" class="table">
+            {{#each userbookslist}}
+            <tr>
+                <td>
+                    <img src="{{this.bookimgurlone}}" height="100" width="100" />
+                    <p>{{this.bookname}}</p>
+                </td>
+                <td>
+                </td>
+                <td>
+                    <br>
+                    <button type="button" class="btn btn-lg" data-toggle="modal" data-target="#myModal">Exchange this</button>
+                </td>
+            </tr>
+            {{/each}}
+
+        </table>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p id="modalmessage"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Confirm</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+{{> footer}}

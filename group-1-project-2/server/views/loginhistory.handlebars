@@ -1,0 +1,32 @@
+{{> header}}
+<link rel="stylesheet" href="/public/css/loginhistory.css">
+
+<div class="container">
+    <h1>Login History</h1>
+    {{!--check if there is a errormessage 
+    if no error message display the table  --}}
+    {{# if errmsg}}
+    <p>{{errmsg}}</p>
+    {{else}}
+    <div class="tablecontainer scroll">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>login date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each loginhistory}}
+                <tr>
+                    <td>{{incremented @index}}</td>
+                    <td>{{this.lastlogindate}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{/if}}
+    </div>
+</div>
+
+{{> footer}}
