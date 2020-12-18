@@ -114,7 +114,7 @@ app.get("/home", (req, res) => {
       //check if errors
       if (err != null) {
         req.session.errmsg = "Something went wrong, please try again later!";
-        res.render("home", {
+        res.send({
           layout: false,
           selectedgenre: genreid,
           searchbooktext: req.session.searchbooktext,
@@ -124,7 +124,7 @@ app.get("/home", (req, res) => {
           lastloginmsg: req.session.lastloginmsg,
         });
       } else {
-        res.render("home", {
+        res.send({
           layout: false,
           selectedgenre: genreid,
           searchbooktext: req.session.searchbooktext,
@@ -440,27 +440,26 @@ app.post("/uploadbook", upload.single("myfile"), (req, res) => {
   });
 });
 
-app.get("/loginhistory", (req, res) => {
+app.post("/loginhistory", (req, res) => {
   //get connection
   const connection = getNewConnection();
   //write query to get date from loginhistory table
-  const queryString = `select lastlogindate from loginhistory where uid=${req.session.uid}`;
+  const queryString = `select lastlogindate from loginhistory where uid=${req.body.uid}`;
   //execute the query
+  console.log(queryString);
   connection.query(queryString, (err, result, fields) => {
     //check if errors
     if (err != null) {
       console.error(err);
       //if errors send a message to user that server error exists
-      res.render("loginhistory", {
-        layout: false,
-        errmsg: "Something went wrong, please try again later!",
+      res.send({
+        error: "Something went wrong, please try again later!",
         lastloginmsg: req.session.lastloginmsg,
         username: req.session.username,
       });
     } else {
       //if no err exists send data
-      res.render("loginhistory", {
-        layout: false,
+      res.send({
         loginhistory: result,
         username: req.session.username,
         lastloginmsg: req.session.lastloginmsg,
@@ -511,6 +510,7 @@ app.post("/validate", (req, res) => {
       console.log("logged in");
       req.session.username = result[0].username;
       req.session.uid = result[0].uid;
+      console.log(req.session.uid);
       res.send({ username: result[0].username, uid: result[0].uid });
       return;
     } else {

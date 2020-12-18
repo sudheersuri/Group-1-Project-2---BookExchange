@@ -3,7 +3,10 @@ import React from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import { BrowserRouter as Router, Link, Route, Routes } from "react-router-dom";
 import "./App.css";
+import { useNavigate } from "react-router-dom";
+
 import Login from "./components/Login";
+import LoginHistory from "./components/LoginHistory";
 import Forgot from "./components/Forgot";
 import Signup from "./components/Signup";
 const NavBar = () => {
@@ -26,7 +29,7 @@ const NavBar = () => {
             Genrerating
           </Nav.Link>
           <Nav.Link as={Link} to="/logout">
-            LogOut
+            Logout
           </Nav.Link>
           <Nav.Link as={Link} to="/loginhistory">
             Login History
@@ -64,8 +67,9 @@ function Footer() {
 }
 
 function Logout() {
+  let navigate = useNavigate();
   localStorage.removeItem("uid");
-  window.location.href = "/login";
+  navigate("/login", { replace: true });
   return (
     <div style={{ padding: 20 }}>
       <h2>logging out..</h2>
@@ -90,6 +94,7 @@ function App() {
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/loginhistory" element={<LoginHistory />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/genre" element={<Genre />} />

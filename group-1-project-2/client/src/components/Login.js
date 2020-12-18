@@ -1,13 +1,23 @@
 import Axios from "axios";
 import React, { useState } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+
+import {
+  Button,
+  Col,
+  Container,
+  Form,
+  Row,
+  Navigate,
+  Nav,
+} from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 function Login() {
+  let navigate = useNavigate();
+
   const [errormessage, setErrorMesssage] = useState("");
   const onFormSubmit = (e) => {
     const formData = new FormData(e.target);
     const formDataObj = Object.fromEntries(formData.entries());
-    console.log(formDataObj);
     Axios.post("http://localhost:4000/validate", formDataObj).then(
       (response) => {
         if (typeof response.data.error !== "undefined") {
@@ -16,7 +26,7 @@ function Login() {
         } else {
           localStorage.setItem("uid", response.data.uid);
           localStorage.setItem("username", response.data.username);
-          window.location.href = "/home";
+          navigate("/home");
         }
       }
     );
