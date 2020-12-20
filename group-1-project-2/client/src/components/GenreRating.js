@@ -5,6 +5,9 @@ import rating from "../assets/rating.jpg";
 import { useNavigate } from "react-router-dom";
 export default function GenreRating() {
   //part 1
+  if (!localStorage.getItem("uid")) {
+    window.location.href = "/login";
+  }
   const [message, setMesssage] = useState("");
   const [errmessage, setErrMesssage] = useState("");
 

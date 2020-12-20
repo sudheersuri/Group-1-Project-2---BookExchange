@@ -12,6 +12,9 @@ import {
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 function Login() {
+  if (localStorage.getItem("uid")) {
+    window.location.href = "/home";
+  }
   let navigate = useNavigate();
 
   const [errormessage, setErrorMesssage] = useState("");

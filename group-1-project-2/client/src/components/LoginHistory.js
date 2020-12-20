@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function LoginHistory() {
   //part 1
+  if (!localStorage.getItem("uid")) {
+    window.location.href = "/login";
+  }
   const [message, setMesssage] = useState("");
   const [response, setResponse] = useState([]);
   var scrollcss = {

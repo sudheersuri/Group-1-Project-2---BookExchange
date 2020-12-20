@@ -2,8 +2,12 @@ import Axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-export default function Signup() {
-  let navigate = useNavigate();
+export default function EditProfile() {
+  const [redirect, setRedirect] = useState("");
+
+  if (!localStorage.getItem("uid")) {
+    window.location.href = "/login";
+  }
 
   const [response, setResponse] = useState("");
 

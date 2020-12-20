@@ -57,7 +57,10 @@ app.use(session({ secret: "sss1234" }));
 app.use("/public", express.static(path.join(__dirname, "public")));
 
 // Body Parser Middleware
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  bodyParser.json({ limit: "50mb", extended: true }),
+  bodyParser.urlencoded({ extended: false })
+);
 app.use(bodyParser.json());
 
 //there is no need of login in below
@@ -91,7 +94,7 @@ app.get("/home", (req, res) => {
       } else if (result.length > 1) {
         //if there is more than 1 row , get the last login date store it in lastloginmsg variable
         req.session.lastloginmsg =
-          "Last loggedin at " + result[0].lastlogindate.split("T")[0] + " ISO";
+          "last logged in at " + result[0].lastlogindate.split("T")[0] + " ISO";
       }
     });
   } else req.session.lastloginmsg = "Welcome to BookExchange";
@@ -137,6 +140,30 @@ app.get("/home", (req, res) => {
   });
 });
 
+app.get("/homepage", (req, res) => {
+  uid = req.query.uid;
+  const connection = getNewConnection();
+  queryString = `select lastlogindate from loginhistory where uid=${uid} order by lastlogindate desc`;
+  //execute the query
+  connection.query(queryString, (err, result, fields) => {
+    if (err != null) {
+      res.send({ error: "Something went wrong!", err });
+    }
+    //if there is more than 1 row , get the last login date store it in lastloginmsg variable
+    var lastloginmsg =
+      "Last loggedin at " + result[0].lastlogindate.split("T")[0] + " ISO";
+    //write the query to get the last login time by uid
+    queryString = `select userbooks.base64data,userbooks.contenttype,users.username,userbooks.bookname,userbooks.bookdesc,userbooks.bookposteddate from users join userbooks on users.uid=userbooks.uid where userbooks.uid=${uid}`;
+    //execute the query
+    connection.query(queryString, (err, result, fields) => {
+      if (err != null) {
+        res.send({ error: "Something went wrong!", err });
+      } else {
+        res.send({ allbooks: result, lastloginmsg });
+      }
+    });
+  });
+});
 app.post("/home", (req, res) => {
   //get the connection
   let queryString = "";
@@ -364,9 +391,9 @@ var storage = multer.diskStorage({
   },
 });
 
-var upload = multer({ storage: storage });
+var upload = multer({ storage: storage }).single("file");
 
-app.get("/uploadbook", (req, res) => {
+app.get("/genre", (req, res) => {
   const connection = getNewConnection();
   const queryString = `select * from genres`;
   //execute the query
@@ -381,50 +408,44 @@ app.get("/uploadbook", (req, res) => {
     } else {
       res.render("uploadbook", {
         genrelist: result,
-        msg: req.session.uploadmsg,
+
         username: req.session.username,
         lastloginmsg: req.session.lastloginmsg,
       });
     }
   });
 });
-app.post("/uploadbook", upload.single("myfile"), (req, res) => {
-  fileextensions = [".jpg", ".jpeg", ".png"];
-  if (
-    !fileextensions.includes(path.extname(req.file.originalname).toLowerCase())
-  ) {
-    req.session.uploadmsg = "Only Images are accepted!";
-    res.redirect("/uploadbook");
+app.post("/uploadbook", (req, res) => {
+  uid = req.body.uid;
+  console.log(req.body);
+  fileextensions = ["image/jpeg", "image/png", "image/jpg"];
+  if (!fileextensions.includes(req.body.file.contentType)) {
+    res.send({ error: "Only Images are accepted!" });
     return;
+  } else {
+    const connection = getNewConnection();
+    currdate = new Date();
+    currdate = currdate.toISOString().replace("T", " ");
+    const queryString = `insert into userbooks(uid,bookid,bookname,bookdesc,base64data,genreid,contenttype,bookposteddate) values(${uid},concat(uid,${Date.now()}),'${
+      req.body.bookname
+    }','${req.body.bookdesc}','${req.body.file.base64Data}',${
+      req.body.genreid
+    },'${req.body.file.contentType}','${currdate}')`;
+    //execute the query
+    console.log(queryString);
+    connection.query(queryString, (err, result, fields) => {
+      //check if errors
+      if (err != null) {
+        console.log(err);
+        res.send({
+          error: "Something went wrong, Please try again later!",
+        });
+      } else {
+        console.log("Book Added");
+        res.send({ message: "Book Added!" });
+      }
+    });
   }
-  currdate = new Date();
-  currdate = currdate.toISOString().replace("T", " ");
-  imgpath =
-    req.protocol +
-    `://` +
-    req.hostname +
-    ":4000/" +
-    req.file.path.replace(/\\/g, "/");
-  const connection = getNewConnection();
-  const queryString = `insert into userbooks(uid,bookid,bookname,bookdesc,bookimgurlone,genreid,bookposteddate) values(${
-    req.session.uid
-  },concat(uid,${Date.now()}),'${req.body.bookname}','${
-    req.body.bookdesc
-  }','${imgpath}',${req.body.genreid},'${currdate}')`;
-  //execute the query
-  console.log(queryString);
-  connection.query(queryString, (err, result, fields) => {
-    //check if errors
-    if (err != null) {
-      console.log(err);
-      req.session.uploadmsg = "Something went wrong, Please try again later!";
-      res.redirect("/uploadbook");
-    } else {
-      console.log("Book Added");
-      req.session.uploadmsg = "Book Added!";
-      res.redirect("/uploadbook");
-    }
-  });
 });
 
 app.post("/loginhistory", (req, res) => {
