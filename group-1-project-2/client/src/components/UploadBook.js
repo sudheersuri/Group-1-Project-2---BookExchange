@@ -6,9 +6,13 @@ export default function UploadBook() {
     window.location.href = "/login";
   }
   const [genrelist, setGenresList] = useState([]);
-  const [message, setMesssage] = useState("");
+  const [message, setMessage] = useState("");
   const [selectedfile, setFile] = useState({});
-
+  const [loading, setLoading] = useState(false);
+  var uploadcss = {
+    opacity: "0.5",
+    fontSize: "20px",
+  };
   //   http:localhost:3000/Public/images/image.jpg
   //part 2
   const onChangeHandler = (event) => {
@@ -32,7 +36,7 @@ export default function UploadBook() {
     }).then((response) => {
       if (typeof response.data.error !== "undefined") {
         // redirect to home
-        setMesssage(response.data.error);
+        setMessage(response.data.error);
       } else {
         setGenresList(response.data.genrelist);
       }
@@ -51,17 +55,19 @@ export default function UploadBook() {
     };
 
     // const formDataObj = Object.fromEntries(formData.entries());
-
+    setMessage("");
+    setLoading(true);
     Axios.post("http://localhost:4000/uploadbook", {
       file: selectedfile,
       uid: localStorage.getItem("uid"),
       ...formDataObj,
     }).then((response) => {
+      setLoading(false);
       if (typeof response.data.error !== "undefined") {
         //redirect to home
-        setMesssage(response.data.error);
+        setMessage(response.data.error);
       } else {
-        setMesssage(response.data.message);
+        setMessage(response.data.message);
       }
     });
   };
@@ -105,6 +111,7 @@ export default function UploadBook() {
               </Form>
               {message}
               <br />
+              {loading ? <i style={uploadcss}>Uploading.......</i> : ""}
               <br />
               <Button variant="primary" type="submit">
                 Submit

@@ -153,7 +153,7 @@ app.get("/homepage", (req, res) => {
     var lastloginmsg =
       "Last loggedin at " + result[0].lastlogindate.split("T")[0] + " ISO";
     //write the query to get the last login time by uid
-    queryString = `select userbooks.base64data,userbooks.contenttype,users.username,userbooks.bookname,userbooks.bookdesc,userbooks.bookposteddate from users join userbooks on users.uid=userbooks.uid where userbooks.uid=${uid}`;
+    queryString = `select userbooks.base64data,userbooks.contenttype,users.username,userbooks.bookname,userbooks.bookdesc,userbooks.bookposteddate from users join userbooks on users.uid=userbooks.uid `;
     //execute the query
     connection.query(queryString, (err, result, fields) => {
       if (err != null) {
