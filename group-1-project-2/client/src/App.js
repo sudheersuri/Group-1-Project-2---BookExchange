@@ -1,14 +1,21 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import { Nav, Navbar } from "react-bootstrap";
-import { BrowserRouter as Router, Link, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Link,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import "./App.css";
-import { useNavigate } from "react-router-dom";
-
+import Forgot from "./components/Forgot";
 import Login from "./components/Login";
 import LoginHistory from "./components/LoginHistory";
-import Forgot from "./components/Forgot";
+import GenreRating from "./components/GenreRating";
 import Signup from "./components/Signup";
+import EditProfile from "./components/EditProfile";
+
 const NavBar = () => {
   return (
     <Navbar bg="light" expand="lg">
@@ -94,10 +101,12 @@ function App() {
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<EditProfile />} />
+
         <Route path="/loginhistory" element={<LoginHistory />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/genre" element={<Genre />} />
+        <Route path="/genrerating" element={<GenreRating />} />
         <Route path="/forgot" element={<Forgot />} />
       </Routes>
     </Router>

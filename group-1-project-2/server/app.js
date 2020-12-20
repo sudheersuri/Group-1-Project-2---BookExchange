@@ -115,7 +115,6 @@ app.get("/home", (req, res) => {
       if (err != null) {
         req.session.errmsg = "Something went wrong, please try again later!";
         res.send({
-          layout: false,
           selectedgenre: genreid,
           searchbooktext: req.session.searchbooktext,
           username: req.session.username,
@@ -125,7 +124,6 @@ app.get("/home", (req, res) => {
         });
       } else {
         res.send({
-          layout: false,
           selectedgenre: genreid,
           searchbooktext: req.session.searchbooktext,
           bookslist: result,
@@ -183,7 +181,6 @@ app.post("/home", (req, res) => {
       if (err != null) {
         req.session.errmsg = "Something went wrong, please try again later!";
         res.render("home", {
-          layout: false,
           selectedgenre: req.body.genreid,
           searchbooktext: req.session.searchbooktext,
           username: req.session.username,
@@ -193,7 +190,6 @@ app.post("/home", (req, res) => {
         });
       } else {
         res.render("home", {
-          layout: false,
           selectedgenre: req.body.genreid,
           searchbooktext: req.session.searchbooktext,
           bookslist: result,
@@ -213,7 +209,8 @@ app.get("/documentation", (req, res) => {
     name: "sudheer",
   });
 });
-app.get("/genres", (req, res) => {
+app.post("/genres", (req, res) => {
+  let uid = req.body.uid;
   const connection = getNewConnection();
   queryString = `select genres.genreid,genres.genredesc,avg(rating) as rating from genrerating join genres on genres.genreid=genrerating.genreid group by genres.genreid`;
 
@@ -221,31 +218,26 @@ app.get("/genres", (req, res) => {
   connection.query(queryString, (err, result, fields) => {
     //check if errors
     if (err != null) {
-      res.render("genres", {
-        layout: false,
-        errmsg: "Something went wrong!",
+      res.send({
+        error: "Something went wrong!",
         username: req.session.username,
         lastloginmsg: req.session.lastloginmsg,
       });
     } else {
       var publicobj = result;
-
-      if (!req.session.uid)
-        res.render("genres", {
-          layout: false,
-          errmsg: "",
+      if (!uid)
+        res.send({
           username: req.session.username,
           allratings: publicobj,
           lastloginmsg: req.session.lastloginmsg,
         });
       else {
-        queryString = `select genres.genredesc,rating as rating,genres.genreid from genrerating join genres on genres.genreid=genrerating.genreid where genrerating.uid=${req.session.uid} group by genres.genreid`;
+        queryString = `select genres.genredesc,rating as rating,genres.genreid from genrerating join genres on genres.genreid=genrerating.genreid where genrerating.uid=${uid} group by genres.genreid`;
         connection.query(queryString, (err, result, fields) => {
           //check if errors
           if (err != null) {
-            res.render("genres", {
-              layout: false,
-              errmsg: "Something went wrong!",
+            res.send({
+              error: "Something went wrong!",
               username: req.session.username,
               lastloginmsg: req.session.lastloginmsg,
             });
@@ -254,9 +246,7 @@ app.get("/genres", (req, res) => {
             if (userratingobj.length == 0) {
               //send userrating as null if there is no userrating.
               publicobj[0].userrating = "";
-              res.render("genres", {
-                layout: false,
-                errmsg: "",
+              res.send({
                 allratings: publicobj,
                 username: req.session.username,
                 lastloginmsg: req.session.lastloginmsg,
@@ -290,18 +280,15 @@ app.get("/genres", (req, res) => {
               console.log("came here");
               //check if errors
               if (err != null) {
-                res.render("genres", {
-                  layout: false,
-                  errmsg: "Something went wrong!",
+                res.send({
+                  error: "Something went wrong!",
                   genrelist: result,
                   allratings: publicobj,
                   username: req.session.username,
                   lastloginmsg: req.session.lastloginmsg,
                 });
               } else {
-                res.render("genres", {
-                  layout: false,
-                  errmsg: "",
+                res.send({
                   genrelist: result,
                   allratings: publicobj,
                   username: req.session.username,
@@ -316,48 +303,50 @@ app.get("/genres", (req, res) => {
   });
 });
 
-app.post("/genres", (req, res) => {
+app.post("/postgenres", (req, res) => {
+  var uid = req.body.uid;
   var genreid = req.body.genreid;
   var rating = req.body.userrating;
   var queryString = "";
   const connection = getNewConnection();
   console.log(genreid + "" + rating);
-  queryString = `select * from genrerating where uid=${req.session.uid} and genreid=${genreid}`;
+  queryString = `select * from genrerating where uid=${uid} and genreid=${genreid}`;
   connection.query(queryString, (err, result, fields) => {
     //check if errors
     console.log(result);
     if (err != null) {
       console.log(err);
-      res.render("genres", {
-        layout: false,
-        errmsg: "Something went wrong",
+      res.send({
+        error: "Something went wrong",
         username: req.session.username,
-        errmsg: "Something went wrong!",
+        error: "Something went wrong!",
         lastloginmsg: req.session.lastloginmsg,
       });
       return;
     } else {
       if (result.length == 0) {
-        queryString = `insert into genrerating(uid,genreid,rating) values(${req.session.uid},${genreid},${rating})`;
+        queryString = `insert into genrerating(uid,genreid,rating) values(${uid},${genreid},${rating})`;
       } else {
-        queryString = `update genrerating set rating=${rating} where uid=${req.session.uid} and genreid=${genreid}`;
+        queryString = `update genrerating set rating=${rating} where uid=${uid} and genreid=${genreid}`;
       }
     }
     connection.query(queryString, (err, result, fields) => {
       //check if errors
       if (err != null)
-        res.render("genres", {
-          layout: false,
+        res.send({
           username: req.session.username,
-          errmsg: "Something went wrong!",
+          error: "Something went wrong!",
           lastloginmsg: req.session.lastloginmsg,
         });
       else {
-        res.redirect("/genres");
+        res.send({
+          message: "Rating has been added!",
+        });
       }
     });
   });
 });
+
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/login");
@@ -385,14 +374,12 @@ app.get("/uploadbook", (req, res) => {
     //check if errors
     if (err != null) {
       res.render("uploadbook", {
-        layout: false,
         errmsg: err,
         username: req.session.username,
         lastloginmsg: req.session.lastloginmsg,
       });
     } else {
       res.render("uploadbook", {
-        layout: false,
         genrelist: result,
         msg: req.session.uploadmsg,
         username: req.session.username,
@@ -555,12 +542,66 @@ app.post("/adduser", (req, res) => {
     }
   });
 });
+
+app.post("/profile", (req, res) => {
+  const connection = getNewConnection();
+  var uid = req.body.uid;
+  const queryString = `select username,email from users  where uid=${uid}`;
+
+  connection.query(queryString, (err, result, fields) => {
+    if (err != null) {
+      res.send({
+        error: "Invalid UID",
+      });
+
+      // Send Code Error to the user.
+    } else {
+      res.send({
+        details: result,
+      });
+    }
+  });
+});
+
+app.post("/updateuser", (req, res) => {
+  const connection = getNewConnection();
+  var uid = req.body.uid;
+  var email = req.body.email;
+  var uname = req.body.uname;
+  if (!authorized_recipients.includes(email)) {
+    req.session.addusrmsg =
+      "Sorry, Only selected confederation college email ids are allowed to signup!";
+    res.send({
+      error:
+        "Sorry, Only selected confederation college email ids are allowed to signup!",
+    });
+    return;
+  }
+  const queryString = `update users set email='${email}', username='${uname}' where uid=${uid}`;
+
+  connection.query(queryString, (err, result, fields) => {
+    if (err != null) {
+      req.session.addusrmsg = "User Already exists!";
+      res.send({
+        error: "Something Went Wrong",
+      });
+
+      // Send Code Error to the user.
+    } else {
+      req.session.username = uname;
+      res.send({
+        message: "User Has been Updated!",
+      });
+    }
+  });
+});
+
 app.get("/signup", (req, res) => {
-  res.render("signup", { layout: false, msg: req.session.addusrmsg });
+  res.render("signup", { msg: req.session.addusrmsg });
 });
 
 app.get("/forget", (req, res) => {
-  res.render("forget", { layout: false, msg: req.session.forgetmailmsg });
+  res.render("forget", { msg: req.session.forgetmailmsg });
 });
 
 app.post("/sendforgetemail", (req, res) => {
@@ -597,7 +638,6 @@ app.post("/sendforgetemail", (req, res) => {
         console.log(body);
         console.log("sent");
       });
-
       res.send({ message: "Recovery Mail has been sent!" });
     }
   });
