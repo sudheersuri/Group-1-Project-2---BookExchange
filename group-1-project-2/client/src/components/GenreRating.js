@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 //Create a fuction GenreRating to generate the ratings for Genre of books
 //It is used to create the ratings of genres of books
 export default function GenreRating() {
-  
+
   if (!localStorage.getItem("uid")) {
     window.location.href = "/login";
   }
@@ -20,7 +20,7 @@ export default function GenreRating() {
 
   const [counter, setCounter] = useState(0);
 
-  
+
   useEffect(() => {
     Axios.post("http://localhost:4000/genres", {
       uid: localStorage.getItem("uid"),
@@ -77,7 +77,7 @@ export default function GenreRating() {
                       <td>{value.genredesc}</td>
                       <td>
                         <img src={rating} width="20" height="20" />
-                        &nbsp;{value.rating}
+                        &nbsp;{(value.rating.toFixed(2))}
                       </td>
                       <td>
                         <img src={rating} width="20" height="20" />
