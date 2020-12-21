@@ -1,7 +1,12 @@
+
+// Importing premade libraries Axios,React,React-bootstrap and react-router-dom
 import Axios from "axios";
 import React, { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+
+//Create a signup function for new user
+//This function allow to create a new user for book exchange
 export default function Signup() {
   let navigate = useNavigate();
   const [message, setMesssage] = useState("");
@@ -11,13 +16,14 @@ export default function Signup() {
     const formDataObj = Object.fromEntries(formData.entries());
     console.log(formDataObj);
     console.log(formDataObj.psw);
+    //Check password is matching or not
     if (formDataObj.psw != formDataObj.cpsw) {
       setMesssage("Passwords dont match");
     } else {
       Axios.post("http://localhost:4000/adduser", formDataObj).then(
         (response) => {
           if (typeof response.data.error !== "undefined") {
-            //redirect to home
+            //It is redirect to home
             setMesssage(response.data.error);
           } else {
             navigate("/login");
@@ -26,6 +32,7 @@ export default function Signup() {
       );
     }
   };
+  // Create a form for signup with fields like username,email address,password and confirm password.
   return (
     <div style={{ padding: 20 }}>
       <Container>
@@ -48,7 +55,7 @@ export default function Signup() {
                   placeholder="Enter email"
                 />
                 <Form.Text className="text-muted">
-                  We'll never share your email with anyone else.
+                  We will never share your email with anyone else.
                 </Form.Text>
               </Form.Group>
               <Form.Group>

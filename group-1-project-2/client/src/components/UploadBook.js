@@ -1,6 +1,10 @@
+// Importing premade libraries Axios,React and React-bootstrap
 import Axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
+
+//Create a function to upload book
+//This function is used to upload a new book with description
 export default function UploadBook() {
   if (!localStorage.getItem("uid")) {
     window.location.href = "/login";
@@ -13,8 +17,8 @@ export default function UploadBook() {
     opacity: "0.5",
     fontSize: "20px",
   };
-  //   http:localhost:3000/Public/images/image.jpg
-  //part 2
+  
+  // Read the image using file reader and setFile as an attachment
   const onChangeHandler = (event) => {
     let reader = new FileReader();
     let file = event.target.files[0];
@@ -35,13 +39,15 @@ export default function UploadBook() {
       uid: localStorage.getItem("uid"),
     }).then((response) => {
       if (typeof response.data.error !== "undefined") {
-        // redirect to home
+        // It is redirecting to home
         setMessage(response.data.error);
       } else {
         setGenresList(response.data.genrelist);
       }
     });
   }, []);
+  
+
   const onFormSubmit = (e) => {
     const formData = new FormData(e.target);
     const formDataObj = Object.fromEntries(formData.entries());
@@ -54,7 +60,6 @@ export default function UploadBook() {
       },
     };
 
-    // const formDataObj = Object.fromEntries(formData.entries());
     setMessage("");
     setLoading(true);
     Axios.post("http://localhost:4000/uploadbook", {
@@ -64,14 +69,14 @@ export default function UploadBook() {
     }).then((response) => {
       setLoading(false);
       if (typeof response.data.error !== "undefined") {
-        //redirect to home
+        //It is redirecting to home
         setMessage(response.data.error);
       } else {
         setMessage(response.data.message);
       }
     });
   };
-
+  //Here we are creating the form for book upload where we add bookname,book description and select genre.After that we submit form and add the values of fields in the table.
   return (
     <div style={{ padding: 20 }}>
       <Container>

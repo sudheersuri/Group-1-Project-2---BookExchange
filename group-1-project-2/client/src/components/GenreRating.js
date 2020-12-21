@@ -1,10 +1,14 @@
+//Importing premade libraries Axios,React,React-bootstrap, react-router-dom and ../assets/rating.jpg
 import Axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Form, Col, Container, Row, Table, Button } from "react-bootstrap";
 import rating from "../assets/rating.jpg";
 import { useNavigate } from "react-router-dom";
+
+//Create a fuction GenreRating to generate the ratings for Genre of books
+//It is used to create the ratings of genres of books
 export default function GenreRating() {
-  //part 1
+  
   if (!localStorage.getItem("uid")) {
     window.location.href = "/login";
   }
@@ -16,13 +20,13 @@ export default function GenreRating() {
 
   const [counter, setCounter] = useState(0);
 
-  //part 2
+  
   useEffect(() => {
     Axios.post("http://localhost:4000/genres", {
       uid: localStorage.getItem("uid"),
     }).then((response) => {
       if (typeof response.data.error !== "undefined") {
-        // redirect to home
+        // It is redirecting to home
         setErrMesssage(response.data.error);
       } else {
         setResponse(response.data.allratings);
@@ -38,7 +42,7 @@ export default function GenreRating() {
     Axios.post("http://localhost:4000/postgenres", formDataObj).then(
       (response) => {
         if (typeof response.data.error !== "undefined") {
-          //redirect to home
+          //It is redirecting to home
           setMesssage(response.data.error);
         } else {
           console.log(counter + ": incrementing counter");
@@ -50,7 +54,7 @@ export default function GenreRating() {
     e.preventDefault();
   };
 
-  //part 3
+  //Here we create a form to generate ratings for genres by using table fields Genre, public rating and your rating
   return (
     <div style={{ padding: 20 }}>
       <Container>
