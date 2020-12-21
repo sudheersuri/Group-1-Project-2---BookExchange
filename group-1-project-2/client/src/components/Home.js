@@ -1,28 +1,28 @@
-import Axios from "axios";
-import React, { useEffect, useState } from "react";
-import { Col, Container, Row, Table } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import Axios from "axios";                                                      //axios is a open source library we have imported for http requests and fetching. 
+import React, { useEffect, useState } from "react";                             //we have imported the react library
+import { Col, Container, Row, Table } from "react-bootstrap";                   // we have imported the react bootstrap library 
+import { Link } from "react-router-dom";                                       // helps to return the first route that matches
 export default function Home() {
   let src = "";
   //part 1
-  if (!localStorage.getItem("uid")) {
+  if (!localStorage.getItem("uid")) {                                         // gets the user id is present in local storage it directs to the login page
     window.location.href = "/login";
   }
-  const [message, setMessage] = useState("");
-  const [response, setResponse] = useState([]);
-  var datecss = {
+  const [message, setMessage] = useState("");                                 // this enables to give the initial state and returns the current state
+  const [response, setResponse] = useState([]);                               // this eanbles to initialise the response
+  var datecss = {                                                            // defines the date feature
     opacity: "0.5",
     fontSize: "10px",
   };
   //part 2
-  useEffect(() => {
+  useEffect(() => {                                                          // this is a function to request to  get the user id  from the defined url
     Axios.get(
       `http://localhost:4000/homepage?uid=${localStorage.getItem("uid")}`
     ).then((response) => {
-      if (typeof response.data.error !== "undefined") {
+      if (typeof response.data.error !== "undefined") {                      //if the user id is not equal to undefined user will be redirected to the home page.
         // redirect to home
         setMessage(response.data.error);
-      } else {
+      } else {                                                               // gives the last login message for the user id and returns all the books                        
         src = `data:image/png;base64{value.base64data}`;
         setMessage(response.data.lastloginmsg);
         setResponse(response.data.allbooks);
@@ -31,7 +31,7 @@ export default function Home() {
   }, []);
 
   //part 3
-  return (
+  return (                                                                       // this function gets the user name of the user id and specfies a message with the Book cover and Book details in a table format. It also assigns Seller tag to the username of the user id fetched.
     <div style={{ padding: 20 }}>
       <Container>
         <Row className="justify-content-md-center">
