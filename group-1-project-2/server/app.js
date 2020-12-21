@@ -1,13 +1,13 @@
 //import required packages.
 const express = require("express");
 const bodyParser = require("body-parser");
-const exphbs = require("express-handlebars");
+
 const path = require("path");
 const cors = require("cors");
 const session = require("express-session");
 const mailgun = require("mailgun-js");
 const mysql = require("mysql2");
-const multer = require("multer");
+
 //setup details for mailgun
 const DOMAIN = "sandbox97e61f2954d34e089bd93a3510e9c5fa.mailgun.org";
 const api_key = "63e5b8e05f853a86285305d137fb29aa-360a0b2c-9b053ba1";
@@ -33,25 +33,6 @@ function getNewConnection() {
 const app = express();
 app.use(cors());
 
-//instantiate handlebars variable
-var handlebars = exphbs.create({
-  defaultLayout: "main",
-  layoutsDir: path.join(__dirname, "views"),
-  partialsDir: path.join(__dirname, "views/partials"),
-  helpers: {
-    incremented: function (index) {
-      index++;
-      return index;
-    },
-    ifEqual: function (a, b, options) {
-      return a == b ? options.fn(this) : options.inverse(this);
-    },
-  },
-});
-
-app.engine("handlebars", handlebars.engine);
-app.set("view engine", "handlebars");
-
 app.use(session({ secret: "sss1234" }));
 // Static folder
 app.use("/public", express.static(path.join(__dirname, "public")));
@@ -65,79 +46,8 @@ app.use(bodyParser.json());
 
 //there is no need of login in below
 app.get("/login", (req, res) => {
-  if (req.session.error != null)
-    // res.render("login",);
-    res.send({ msg: req.session.error });
+  if (req.session.error != null) res.send({ msg: req.session.error });
   else res.send({ msg: false });
-});
-
-app.post("/search", (req, res) => {
-  req.session.searchbooktext = req.body.searchbook;
-});
-
-app.get("/home", (req, res) => {
-  //get the connection
-  let queryString = "";
-  var lastloginmsg = "";
-  const connection = getNewConnection();
-  //write the query to get the last login time by uid
-  if (req.session.uid) {
-    queryString = `select lastlogindate from loginhistory where uid=${req.session.uid} order by lastlogindate desc`;
-    //execute the query
-    connection.query(queryString, (err, result, fields) => {
-      if (err != null) {
-        console.error(err);
-      }
-      if (result.length == 1) {
-        req.session.lastloginmsg = "Welcome to BookExchange";
-        //if there is only 1 row , store - welcome to BookExchange in lastloginmsg variable.
-      } else if (result.length > 1) {
-        //if there is more than 1 row , get the last login date store it in lastloginmsg variable
-        req.session.lastloginmsg =
-          "last logged in at " + result[0].lastlogindate.split("T")[0] + " ISO";
-      }
-    });
-  } else req.session.lastloginmsg = "Welcome to BookExchange";
-
-  queryString = `select * from genres`;
-  //execute the query
-
-  connection.query(queryString, (err, result, fields) => {
-    let genrelist = "";
-    let genreid = "";
-    //check if errors
-    if (err != null) {
-      req.session.errmsg = "Something went wrong, please try again later!";
-    } else {
-      genrelist = result;
-    }
-    genreid = result[0].genreid;
-    queryString = `select userbooks.bookimgurlone,users.username,userbooks.bookname,userbooks.bookdesc,userbooks.bookimgurlone,userbooks.bookposteddate from users join userbooks on users.uid=userbooks.uid where userbooks.genreid=${genreid}`;
-    connection.query(queryString, (err, result, fields) => {
-      //check if errors
-      if (err != null) {
-        req.session.errmsg = "Something went wrong, please try again later!";
-        res.send({
-          selectedgenre: genreid,
-          searchbooktext: req.session.searchbooktext,
-          username: req.session.username,
-          genrelist: genrelist,
-          errmsg: req.session.errmsg,
-          lastloginmsg: req.session.lastloginmsg,
-        });
-      } else {
-        res.send({
-          selectedgenre: genreid,
-          searchbooktext: req.session.searchbooktext,
-          bookslist: result,
-          username: req.session.username,
-          genrelist: genrelist,
-          errmsg: req.session.errmsg,
-          lastloginmsg: req.session.lastloginmsg,
-        });
-      }
-    });
-  });
 });
 
 app.get("/homepage", (req, res) => {
@@ -164,78 +74,7 @@ app.get("/homepage", (req, res) => {
     });
   });
 });
-app.post("/home", (req, res) => {
-  //get the connection
-  let queryString = "";
-  var lastloginmsg = "";
-  req.session.searchbooktext = req.body.searchbook;
-  const connection = getNewConnection();
-  //write the query to get the last login time by uid
-  if (req.session.uid) {
-    queryString = `select lastlogindate from loginhistory where uid=${req.session.uid} order by lastlogindate desc`;
-    //execute the query
-    connection.query(queryString, (err, result, fields) => {
-      if (err != null) {
-        console.error(err);
-      }
-      if (result.length == 1) {
-        req.session.lastloginmsg = "Welcome to BookExchange";
-        //if there is only 1 row , store - welcome to BookExchange in lastloginmsg variable.
-      } else if (result.length > 1) {
-        //if there is more than 1 row , get the last login date store it in lastloginmsg variable
-        req.session.lastloginmsg =
-          "Last loggedin at " + result[0].lastlogindate.split("T")[0] + " ISO";
-      }
-    });
-  } else req.session.lastloginmsg = "Welcome to BookExchange";
 
-  queryString = `select * from genres`;
-  //execute the query
-  connection.query(queryString, (err, result, fields) => {
-    var genrelist = "";
-    //check if errors
-    if (err != null) {
-      req.session.errmsg = "Something went wrong, please try again later!";
-    } else {
-      genrelist = result;
-    }
-    if (req.body.searchbook != "")
-      queryString = `select userbooks.bookimgurlone,users.username,userbooks.bookname,userbooks.bookdesc,userbooks.bookimgurlone,userbooks.bookposteddate from users join userbooks on users.uid=userbooks.uid where userbooks.bookname like '%${req.body.searchbook}%' and userbooks.genreid=${req.body.genreid}`;
-    else
-      queryString = `select userbooks.bookimgurlone,users.username,userbooks.bookname,userbooks.bookdesc,userbooks.bookimgurlone,userbooks.bookposteddate from users join userbooks on users.uid=userbooks.uid where userbooks.genreid=${req.body.genreid}`;
-    connection.query(queryString, (err, result, fields) => {
-      //check if errors
-      if (err != null) {
-        req.session.errmsg = "Something went wrong, please try again later!";
-        res.render("home", {
-          selectedgenre: req.body.genreid,
-          searchbooktext: req.session.searchbooktext,
-          username: req.session.username,
-          genrelist: genrelist,
-          errmsg: req.session.errmsg,
-          lastloginmsg: req.session.lastloginmsg,
-        });
-      } else {
-        res.render("home", {
-          selectedgenre: req.body.genreid,
-          searchbooktext: req.session.searchbooktext,
-          bookslist: result,
-          username: req.session.username,
-          genrelist: genrelist,
-          errmsg: req.session.errmsg,
-          lastloginmsg: req.session.lastloginmsg,
-        });
-      }
-    });
-  });
-});
-app.get("/documentation", (req, res) => {
-  res.send({
-    username: req.session.username,
-    lastloginmsg: req.session.lastloginmsg,
-    name: "sudheer",
-  });
-});
 app.post("/genres", (req, res) => {
   let uid = req.body.uid;
   const connection = getNewConnection();
@@ -377,43 +216,6 @@ app.post("/postgenres", (req, res) => {
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/login");
-});
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/images");
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-var upload = multer({ storage: storage }).single("file");
-
-app.get("/genre", (req, res) => {
-  const connection = getNewConnection();
-  const queryString = `select * from genres`;
-  //execute the query
-  connection.query(queryString, (err, result, fields) => {
-    //check if errors
-    if (err != null) {
-      res.render("uploadbook", {
-        errmsg: err,
-        username: req.session.username,
-        lastloginmsg: req.session.lastloginmsg,
-      });
-    } else {
-      res.render("uploadbook", {
-        genrelist: result,
-
-        username: req.session.username,
-        lastloginmsg: req.session.lastloginmsg,
-      });
-    }
-  });
 });
 app.post("/uploadbook", (req, res) => {
   uid = req.body.uid;
@@ -615,14 +417,6 @@ app.post("/updateuser", (req, res) => {
       });
     }
   });
-});
-
-app.get("/signup", (req, res) => {
-  res.render("signup", { msg: req.session.addusrmsg });
-});
-
-app.get("/forget", (req, res) => {
-  res.render("forget", { msg: req.session.forgetmailmsg });
 });
 
 app.post("/sendforgetemail", (req, res) => {

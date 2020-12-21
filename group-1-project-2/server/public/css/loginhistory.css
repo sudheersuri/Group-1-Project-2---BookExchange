@@ -1,9 +1,0 @@
-.tablecontainer {
-    position: relative;
-    height: 300px;
-    overflow: auto;
-}
-
-.scroll {
-    display: block;
-}

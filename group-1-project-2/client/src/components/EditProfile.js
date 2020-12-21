@@ -38,6 +38,7 @@ export default function EditProfile() {
           //redirect to home
           setMesssage(response.data.error);
         } else {
+          localStorage.setItem("username", formDataObj.uname);
           setMesssage(response.data.message);
           setCounter(counter + 1);
         }
