@@ -5,9 +5,6 @@
 # Home Page
 ![alt text](https://github.com/sudheersuri/Group-1-Project-2---BookExchange/blob/master/screenshots/home.PNG?raw=true)
 
-# Login Page
-![alt text](https://github.com/sudheersuri/Group-1-Project-2---BookExchange/blob/master/screenshots/login.PNG?raw=true)
-
 # Login histoy page
 ![alt text](https://github.com/sudheersuri/Group-1-Project-2---BookExchange/blob/master/screenshots/loginhistory.PNG?raw=true)
 
