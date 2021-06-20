@@ -279,6 +279,7 @@ app.post("/loginhistory", (req, res) => {
 });
 
 app.post("/validate", (req, res) => {
+  
   const connection = getNewConnection();
   var email = req.body.email; //email
   var psw = req.body.psw; //psw
