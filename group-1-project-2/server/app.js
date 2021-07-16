@@ -9,14 +9,11 @@ const mailgun = require("mailgun-js");
 const mysql = require("mysql2");
 
 //setup details for mailgun
-const DOMAIN = "sandbox97e61f2954d34e089bd93a3510e9c5fa.mailgun.org";
-const api_key = "63e5b8e05f853a86285305d137fb29aa-360a0b2c-9b053ba1";
+const DOMAIN = "";
+const api_key = "";
 const mg = mailgun({ apiKey: api_key, domain: DOMAIN });
 const authorized_recipients = [
   "ssuri@confederationcollege.ca",
-  "mkoyande@confederationcollege.ca",
-  "eduardo.coelhoreis@confederationcollege.ca",
-  "skaur9@confederationcollege.ca",
 ];
 
 function getNewConnection() {
